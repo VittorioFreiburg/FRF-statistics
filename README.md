@@ -70,10 +70,11 @@ Snippet di codice
   title       = {Statistical Analysis of Frequency Response Functions: A MATLAB Library Reference Manual},
   author      = {Lippi, Vittorio},
   year        = {2026},
+  month       = {March},
   type        = {Technical Report},
-  institution = {Zenodo},
-  doi         = {10.5281/zenodo.XXXXXXX},
-  url         = {[https://doi.org/10.5281/zenodo.XXXXXXX](https://doi.org/10.5281/zenodo.XXXXXXX)}
+  institution = {Calejo},
+  doi         = {10.5281/zenodo.18888167},
+  url         = {https://doi.org/10.5281/zenodo.18888167}
 }
 Depending on the specific methodologies utilized from this library, please also consider citing the primary research papers where these algorithms were introduced:
 
