@@ -1,6 +1,6 @@
 # Statistical Analysis of Frequency Response Functions (FRF) - MATLAB Library
 
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.XXXXXXX.svg)](https://doi.org/10.5281/zenodo.XXXXXXX) 
+DOI:  10.5281/zenodo.18888166
 
 
 ## Overview
