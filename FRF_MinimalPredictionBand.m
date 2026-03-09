@@ -1,16 +1,28 @@
 function [avg,sigma,band,Cp,chist,values,alpha] = FRF_MinimalPredictionBand(X,FRFs,phi,sample_time,B)
-%[AVG,SIGMA,VOL,CP,CHIST,VALUES,ALPHA] =
-%FRF_MINIMALPREDICTIONBAND(X,FRFS,PHI,SAMPLE_TIME,B)
-% Computes the minimum Cp that includes the tested FRF X and the empirical
-% ALPHA associated with it.
-% where avg is average PIR, sigma is the measure of variation ?ˆx(t), band
-% a two row matrix with the boundaries of the band. Cp is the threshold
-% constant obtained by the bootstrap.  FRFS is a matrix where each row
-% represents a FRF of the set, phi is the vector of frequencies  and
-% SAMPLE_TIME is the sample time of the PIRs. Chist is a vector
-% representing the cumulative histogram for the values  returned in VALUES.
-% 
-% Fully supports both SISO and MIMO arrays via FRF_Supervector.
+% FRF_MINIMALPREDICTIONBAND Computes the minimum threshold to encompass a tested FRF.
+%
+%   [avg, sigma, band, Cp, chist, values, alpha] = FRF_MinimalPredictionBand(X, FRFs, phi, dt, B)
+%   evaluates how abnormal a specific tested sample (X) is compared to a baseline 
+%   population (FRFs). It calculates the tightest possible boundary level (alpha) 
+%   needed so that the tested sample just barely fits inside the band.
+%
+%   INPUTS:
+%       X           : The single complex FRF test sample to be evaluated (1 x F).
+%       FRFs        : The baseline/historical complex FRF data (N x F).
+%       phi         : Vector of evaluated frequencies (in Hz).
+%       sample_time : Time step resolution (dt) for internal PIR conversion.
+%       B           : Number of bootstrap iterations.
+%
+%   OUTPUTS:
+%       avg         : The baseline average PIR.
+%       sigma       : The measure of baseline variation (standard deviation).
+%       band        : A 2-row matrix containing the boundaries of the band 
+%                     (Row 1: Lower bound, Row 2: Upper bound) scaled precisely to X.
+%       Cp          : The minimal threshold constant required to include X.
+%       chist       : The cumulative histogram for the values returned in 'values'.
+%       values      : The threshold values corresponding to the histogram.
+%       alpha       : The empirical probability level associated with encompassing X. 
+%                     (e.g., an alpha of 0.99 means X is highly abnormal).
 
     % --- UNIVERSAL DATA INGESTION ---
     % xt will be 1 x L (where L is time steps * channels)
@@ -66,5 +78,5 @@ function [avg,sigma,band,Cp,chist,values,alpha] = FRF_MinimalPredictionBand(X,FR
     sigma = sx;
 
     % The band automatically scales to physical units (SISO) or raw concatenated units (MIMO)
-    band = [avg + Cp * sigma; avg - Cp * sigma];
+    band = [avg - Cp*sigma; avg + Cp*sigma]; % Row 1: Lower bound, Row 2: Upper bound
 end

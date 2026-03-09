@@ -1,5 +1,28 @@
 function [p_value, F_obs, R2, perm_F] = FRF_permanova(FRFs, groups, phi, sample_time, B)
-% FRF_PERMANOVA Performs Permutational MANOVA on FRF data.
+% FRF_PERMANOVA Performs Permutational Multivariate Analysis of Variance on FRFs.
+%
+%   [p_value, F_obs, R2, perm_F] = FRF_permanova(FRFs, groups, phi, sample_time, B)
+%   tests whether the variance between multiple groups of FRFs significantly 
+%   exceeds the variance within the groups. It operates on the time-domain 
+%   Supervectors and automatically applies Z-Score Standardization to ensure 
+%   variables with large magnitudes do not unfairly dominate the analysis.
+%
+%   INPUTS:
+%       FRFs        : Complex frequency response data (supports MIMO arrays).
+%       groups      : A vector of group labels corresponding to each sample in FRFs.
+%       phi         : Vector of evaluated frequencies (in Hz).
+%       sample_time : Time step resolution (dt).
+%       B           : Number of permutations used to build the null distribution.
+%
+%   OUTPUTS:
+%       p_value     : The statistical significance (probability of observing the 
+%                     variance by random chance). Typically, p < 0.05 rejects 
+%                     the null hypothesis.
+%       F_obs       : The observed pseudo-F statistic for the true groupings.
+%       R2          : The R-squared value, indicating the proportion of variance 
+%                     explained by the grouping.
+%       perm_F      : The vector of pseudo-F statistics generated across all 
+%                     B permutations (useful for plotting the null distribution).
 
     % 1. Get the raw stacked PIR Supervectors
     [S_raw, ~] = FRF_Supervector(FRFs, phi, sample_time);

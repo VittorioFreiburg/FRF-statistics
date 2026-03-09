@@ -1,19 +1,37 @@
 function [avg,sigma,band,Cc,chist,values] = FRF_ConfidenceBandDifference(FRF1,FRF2,phi,sample_time,alpha,B,Bs)
-%[AVG,SIGMA,band,CC,CHIST,VALUES] =
-%FRF_CONFIDENCEBANDDIFFERENCE(FRFS1,FRFS2,PHI,SAMPLE_TIME,B)
-% Confidence bands on the difference between the means of two groups FRF1
-% andd FRF2.
+% FRF_CONFIDENCEBANDDIFFERENCE Computes confidence bands on the difference 
+% between the means of two independent groups (Unpaired Test).
 %
-% B is the number of bootstrap repetitions
-% Bs is the number of bootstrap repetitions used to estimate STD
+%   [avg, sigma, band, Cc, chist, values] = FRF_ConfidenceBandDifference(FRF1, FRF2, phi, dt, alpha, B, Bs)
+%   evaluates whether two distinct sets of FRFs are statistically different 
+%   from one another. It calculates the average difference between the groups' 
+%   PIRs and generates a confidence band around that difference. If the resulting 
+%   band does not cross the zero line, the difference is statistically significant.
 %
-% avg is the difference between average PIRs of the groups, sigma is the
-% measure of variation ?ˆx(t), band a two row matrix with the boundaries of
-% the band. Cp is the threshold constant obtained by the bootstrap.  FRFS
-% is a matrix where each row represents a FRF of the set, phi is the vector
-% of frequencies  and SAMPLE_TIME is the sample time of the PIRs. Chist is
-% a vector representing the cumulative histogram for the values  returned
-% in VALUES.
+%   INPUTS:
+%       FRF1        : Complex frequency response data for Group 1 (N1 x F).
+%       FRF2        : Complex frequency response data for Group 2 (N2 x F).
+%                     Note: N1 must equal N2.
+%       phi         : Vector of evaluated frequencies (in Hz).
+%       sample_time : Time step resolution (dt) for internal PIR conversion.
+%       alpha       : The desired statistical significance level (e.g., 0.95).
+%       B           : The number of outer bootstrap repetitions used to calculate 
+%                     the main statistic distribution.
+%       Bs          : The number of inner bootstrap repetitions used to estimate 
+%                     the standard deviation for studentization.
+%
+%   OUTPUTS:
+%       avg         : The difference between the average PIRs of the two groups.
+%       sigma       : The measure of variation (standard deviation of the difference).
+%       band        : A 2-row matrix defining the statistical boundaries:
+%                     - Row 1: The Lower Bound (Floor)
+%                     - Row 2: The Upper Bound (Ceiling)
+%       Cc          : The threshold constant obtained by the bootstrap.
+%       chist       : The cumulative histogram of the bootstrap statistics.
+%       values      : The corresponding boundary values for the histogram.
+%
+%   NOTES:
+%       Ensure your data does not contain unwanted 0 Hz DC offsets before processing.
 
 N1 = size(FRF1, 1);
 N2 = size(FRF2, 1);
@@ -76,6 +94,6 @@ Cc = values(find(chist > alpha, 1, 'first'));
 avg = xm;
 sigma = sx;
 
-band = [avg + Cc * sigma; avg - Cc * sigma];
+band = [avg - Cp*sigma; avg + Cp*sigma]; % Row 1: Lower bound, Row 2: Upper bound
 
 end

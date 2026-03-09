@@ -1,12 +1,29 @@
 function [avg,sigma,band,Cp,chist,values] = FRF_PredictionBand(FRFs,phi,sample_time,alpha,B)
-%[AVG,SIGMA,VOL,CP,CHIST,VALUES] =
-%FRF_PREDICTIONBAND(FRFS,PHI,SAMPLE_TIME,B)
-% where avg is average PIR, sigma is the measure of variation ?ˆx(t), band
-% a two row matrix with the boundaries of the band. Cp is the threshold
-% constant obtained by the bootstrap.  FRFS is a matrix where each row
-% represents a FRF of the set, phi is the vector of frequencies  and
-% SAMPLE_TIME is the sample time of the PIRs. Chist is a vector
-% representing the cumulative histogram for the values  returned in VALUES.
+% FRF_PREDICTIONBAND Calculates a non-parametric prediction band for future samples.
+%
+%   [avg, sigma, band, Cp, chist, values] = FRF_PredictionBand(FRFs, phi, dt, alpha, B)
+%   computes a statistical boundary indicating where the next *single* observation 
+%   of a system is expected to fall. Unlike a confidence band (which bounds the 
+%   average), a prediction band accounts for the natural spread of individual 
+%   data points and is therefore inherently wider.
+%
+%   INPUTS:
+%       FRFs        : Complex frequency response baseline data (N x F).
+%       phi         : Vector of evaluated frequencies (in Hz).
+%       sample_time : Time step resolution (dt) for internal PIR conversion.
+%       alpha       : The desired probability level for the band (e.g., 0.95 
+%                     means a 95% chance the next single sample falls inside).
+%       B           : Number of bootstrap iterations (e.g., 1000).
+%
+%   OUTPUTS:
+%       avg         : The average Pseudo Impulse Response (PIR).
+%       sigma       : The standard deviation of the samples.
+%       band        : A 2-row matrix defining the statistical boundaries:
+%                     - Row 1: The Lower Bound (Floor)
+%                     - Row 2: The Upper Bound (Ceiling)
+%       Cp          : The threshold constant obtained by the bootstrap.
+%       chist       : The cumulative histogram of the bootstrap statistics.
+%       values      : The corresponding boundary values for the histogram.
 
 N=size(FRFs,1); %number of FRFs
 [yt, t] = FRF_Supervector(FRFs, phi, sample_time);
@@ -49,6 +66,6 @@ Cp=values(find(chist>alpha,1,'first'));
 avg=xm;
 sigma=sx;
 
-band=[avg+Cp*sigma;avg-Cp*sigma];
+band = [avg - Cp*sigma; avg + Cp*sigma]; % Row 1: Lower bound, Row 2: Upper bound
 end
 

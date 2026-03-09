@@ -1,24 +1,28 @@
 function [cdf,pdf,sigma_cdf,sigma_pdf] = FRF_pdf(varargin)
-% [cdf,pdf,sigma_cdf,sigma_pdf] = FRF_pdf(X,FRFs,phi,sample_time,B,metric)
+% FRF_PDF Estimates the empirical density functions associated with a sample.
 %
-% estimates the cumulative densitiy function and the density function
-% associated to the sample X and a STD on their estimation. 
-% the input METRIC defines the measure used to define the distance
-% between X and the mean of the sample FRFs. By default it is the sum of
-% squared residuals
-% distance, if METRIC is a function handle it is applied directly. The
-% following strings can be specified:
-% - 'squared' sum of squared residuals
-% - 'max' maximum difference between two samples
-% 
-    function [cdf, pdf, sigma_cdf, sigma_pdf] = FRF_pdf(varargin)
-% [cdf,pdf,sigma_cdf,sigma_pdf] = FRF_pdf(X,FRFs,phi,sample_time,B,metric)
+%   [cdf, pdf, sigma_cdf, sigma_pdf] = FRF_pdf(X, FRFs, phi, sample_time, B, metric)
+%   calculates the exact statistical probability of observing a specific sample (X) 
+%   given a baseline dataset (FRFs). It estimates both the Cumulative Density 
+%   Function (CDF) and Probability Density Function (PDF) alongside their 
+%   respective standard deviations.
 %
-% Estimates the cumulative density function and the probability density 
-% function associated with the sample X, and a STD on their estimation.
-%  
+%   INPUTS:
+%       X           : The single complex FRF test sample (1 x F).
+%       FRFs        : The baseline complex FRF data (N x F).
+%       phi         : Vector of evaluated frequencies (in Hz).
+%       sample_time : Time step resolution (dt).
+%       B           : Number of bootstrap iterations.
+%       metric      : (Optional) Defines the distance measure between X and the 
+%                     sample mean. Can be a custom function handle or a string:
+%                     - 'squared' : Sum of squared residuals (Default).
+%                     - 'max'     : Maximum difference between two samples.
 %
-% Fully supports both SISO and MIMO arrays via FRF_Supervector.
+%   OUTPUTS:
+%       cdf         : The estimated cumulative density probability of X.
+%       pdf         : The estimated probability density of X.
+%       sigma_cdf   : Standard deviation on the CDF estimation.
+%       sigma_pdf   : Standard deviation on the PDF estimation.
 
 if nargin == 5
    metric = @(x,y) sum((x-y).^2, 2);
